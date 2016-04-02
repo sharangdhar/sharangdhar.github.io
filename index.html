@@ -2,7 +2,7 @@
 <html lang="en-us">
   <head>
     <meta charset="UTF-8">
-    <title>Cayman</title>
+    <title>Bond Assigner</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#157878">
     <link rel="stylesheet" href="css/normalize.css">
@@ -11,66 +11,103 @@
   </head>
   <body>
     <section class="page-header">
-      <h1 class="project-name">Cayman</h1>
-      <h2 class="project-tagline">A responsive theme for your project on GitHub Pages</h2>
-      <a href="#" class="btn">View on GitHub</a>
-      <a href="#" class="btn">Download .zip</a>
-      <a href="#" class="btn">Download .tar.gz</a>
+      <h1 class="project-name">Bond Assigner</h1>
+      <h2 class="project-tagline">A Parallel Perfect Matching Graph Algortithm for Chemical Bond Assignment</h2>
+      <a href="#" class="btn">Proposal</a>
+      <a href="#" class="btn">View on Github</a>
     </section>
 
     <section class="main-content">
-      <p>Text can be <strong>bold</strong>, <em>italic</em>, or <del>strikethrough</del>. <a href="https://github.com">Links</a> should be blue with no underlines (unless hovered over).</p>
-
-      <p>There should be whitespace between paragraphs. There should be whitespace between paragraphs. There should be whitespace between paragraphs. There should be whitespace between paragraphs.</p>
-
-      <p>There should be whitespace between paragraphs. There should be whitespace between paragraphs. There should be whitespace between paragraphs. There should be whitespace between paragraphs.</p>
-
-      <blockquote>
-      <p>There should be no margin above this first sentence.</p>
-
-      <p>Blockquotes should be a lighter gray with a gray border along the left side.</p>
-
-      <p>There should be no margin below this final sentence.</p>
-      </blockquote>
-
-      <h1>
-      <a id="user-content-header-1" class="anchor" href="#header-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Header 1</h1>
-
-      <p>This is a normal paragraph following a header. Bacon ipsum dolor sit amet t-bone doner shank drumstick, pork belly porchetta chuck sausage brisket ham hock rump pig. Chuck kielbasa leberkas, pork bresaola ham hock filet mignon cow shoulder short ribs biltong.</p>
+ 
+      <h1 align="center">
+      <a id="user-content-header-1" class="anchor" href="#header-1" aria-hidden="true"><span class="octicon octicon-link"></span></a><b>Proposal</b></h1>
 
       <h2>
-      <a id="user-content-header-2" class="anchor" href="#header-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Header 2</h2>
+      <a id="user-content-header-2" class="anchor" href="#header-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Title</h2>
 
-      <blockquote>
-      <p>This is a blockquote following a header. Bacon ipsum dolor sit amet t-bone doner shank drumstick, pork belly porchetta chuck sausage brisket ham hock rump pig. Chuck kielbasa leberkas, pork bresaola ham hock filet mignon cow shoulder short ribs biltong.</p>
-      </blockquote>
+     
+      <p>A Parallel Perfect Matching Graph Algorithm for Chemical Bond Assignment.</p>
+     
 
-      <h3>
-      <a id="user-content-header-3" class="anchor" href="#header-3" aria-hidden="true"><span class="octicon octicon-link"></span></a>Header 3</h3>
+      <h2>
+      <a id="user-content-header-2" class="anchor" href="#header-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Summary</h2>
 
-      <pre><code>This is a code block following a header.</code></pre>
+     
+      <p>We are implementing a system for multi-core CPUs that takes in a molecule whose bond orders are unknown and computes the optimal bond order assignment. We are building the system in C++ using OpenMP and will be using a parallel perfect matching algorithm to compute the bond assignment.</p>
 
-      <h4>
-      <a id="user-content-header-4" class="anchor" href="#header-4" aria-hidden="true"><span class="octicon octicon-link"></span></a>Header 4</h4>
+
+       <h2>
+      <a id="user-content-header-2" class="anchor" href="#header-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Background</h2>
+
+     
+      <p>A molecule is an electrically neutral group of two or more atoms held together by chemical bonds. The bonds between the atoms determine many of the properties of the molecule. One common problem in the field of Computational Biology is determining molecular structure for molecules whose atomic coordinates are known but whose bonds are unknown. Given the atomic coordinates, we can complete the picture for a given molecule by specifying an assignment of bonds to the atoms within the molecule.  <br><br>
+
+      We can represent the atoms within a molecule as vertices and the bonds between them as edges. We note however that a single molecule can contain multiple bond types (e.g. single, double, triple). Computing an optimal assignment of these various types of bonds requires determining a perfect weighted matching for the molecule. A number of open source libraries attempt to implement this matching algorithm, but they are exponential in the number of fused rings (cycles) within the molecule. Given that molecules encountered in practice can have hundreds of atoms, an exponential solution is highly impractical. <br><br>
+
+      To solve this problem, we are implementing a parallel perfect weighted matching algorithm that can be used to determine an optimal assignment. The algorithm is detailed in sections 3.1 and 3.2 of the course notes for the Fall 2004 edition of 15-859. It involves computing a sub-matrix determinant for each edge in the graph. The algorithm is inherently edge-parallel. Furthermore, we believe we can take advantage of the similarities of the sub-matrices to drastically reduce computation time. 
+      </p>
+
+      <h2>
+      <a id="user-content-header-2" class="anchor" href="#header-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>The Challenge</h2>
+
+      <p> COMING SOON !! </p>
+
+      <h2>
+      <a id="user-content-header-2" class="anchor" href="#header-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Resources</h2>
+
+        <blockquote><h4>Starter Code</h4></blockquote>
+
+        We will be using starter code provided by Dr. Hutchison in the following <a target="_blank" href="https://github.com/ghutchis/parallel-matching/tree/master">repository</a>.
+        
+
+
+        For our purposes, we will be using a CPU. We will be using C++ and OpenMp.
+
+       <blockquote><h4>Papers</h4></blockquote>
+
+        <p>These two papers contain the parallel algorithm for obtaining a perfect matching we want to implement. </p>
 
       <ul class="task-list">
-      <li>This is an unordered list following a header.</li>
-      <li>This is an unordered list following a header.</li>
-      <li>This is an unordered list following a header.</li>
+        <li><a target="_blank" href="https://github.com/ghutchis/parallel-matching/blob/master/papers/Chawla-2004.pdf" >Finding Perfect Matching by Shuchi Chawla</a></li> <br>
+        <li><a target="_blank" href="https://github.com/ghutchis/parallel-matching/blob/master/papers/Mulmuley-1987.pdf">Matching is as Easy as Matrix Inversion by Ketan Mulmuley, Umesh V. Vazirani and Vijay V. Vazirani.</a></li>
       </ul>
 
-      <h5>
-      <a id="user-content-header-5" class="anchor" href="#header-5" aria-hidden="true"><span class="octicon octicon-link"></span></a>Header 5</h5>
+      <h2>
+      <a id="user-content-header-2" class="anchor" href="#header-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Goals and Deliverables</h2>
 
-      <ol class="task-list">
-      <li>This is an ordered list following a header.</li>
-      <li>This is an ordered list following a header.</li>
-      <li>This is an ordered list following a header.</li>
-      </ol>
+      <blockquote><h4>Core Goals</h4></blockquote>
+      <p>
+        We plan to achieve a significant speedup in the process of chemical bond assignment by making the process parallel across a number of metrics. Currently the baseline implementation runs in exponential time. The algorithm we are implementing will make the runtime polynomial. 
+      </p>
+      
+      <p>
+      Our first core goal is to have this polynomial implementation working very efficiently and scale properly with different number of cores. We want to come up with an implementation and make optimizations that allow us to divide the work among all the cores evenly and utilize the all the available contexts within them. </p>
 
-      <h6>
-      <a id="user-content-header-6" class="anchor" href="#header-6" aria-hidden="true"><span class="octicon octicon-link"></span></a>Header 6</h6>
+      <p>
+      Our second core goal is to parallelize matrix determinant calculations as this will help in speeding up our first goal. We plan to achieve maximum speedup by figuring out the dependencies among different steps of calculating the determinant and scheduling this work in an optimal way across the available resources.</p>
 
+      <blockquote><h4>Demo</h4></blockquote>
+
+      We will make a non-interactive demo, however we will show speed-up graphs of how our algorithm performed when scaled across different input sizes and different number of cores.
+
+      <blockquote><h4>Stretch Goals</h4></blockquote>
+
+      We plan to make a web application that would make our demo interactive. We want to be able to represent the molecules visually and also show the bond adding in real time. We also want to generate the speed up graph for the particular machine through the app itself. 
+
+      <h2>
+      <a id="user-content-header-2" class="anchor" href="#header-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Platform Choice</h2>
+      <p>
+        We have chosen to make this project for the CPU. The reason for choosing CPU is that our program will be mostly run on real-sized systems like laptops. Even though the algorithm is scalable to work on a GPU, we want to implement a version for the CPU because of the needs of the bigger projects our program will be a part of.</p>
+      <p>
+        Secondly, we are using C++ and OpenMP. The primary reason for using C++ is that we can achieve very high performance. Other than that, it also has a great support of libraries that we can use. The reason for using OpenMP is that it works very well with C++ and gives a lot of primitives that help in writing parallelizable code.</p>
+      <p>
+        Finally, for our stretch goal, we will use Django to make our web app. </p>
+      </p>
+
+      <h2>
+      <a id="user-content-header-2" class="anchor" href="#header-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Schedule</h2>
+
+      <p> COMING SOON !! </p>
       <table>
       <thead>
       <tr>
@@ -94,213 +131,11 @@
       </tbody>
       </table>
 
-      <hr>
-
-      <p>There's a horizontal rule above and below this.</p>
-
-      <hr>
-
-      <p>Here is an unordered list:</p>
-
-      <ul class="task-list">
-      <li>Salt-n-Pepa</li>
-      <li>Bel Biv DeVoe</li>
-      <li>Kid 'N Play</li>
-      </ul>
-
-      <p>And an ordered list:</p>
-
-      <ol class="task-list">
-      <li>Michael Jackson</li>
-      <li>Michael Bolton</li>
-      <li>Michael Bublé</li>
-      </ol>
-
-      <p>And an unordered task list:</p>
-
-      <ul class="task-list">
-      <li class="task-list-item">
-      <input type="checkbox" class="task-list-item-checkbox" checked="" disabled=""> Create a sample markdown document</li>
-      <li class="task-list-item">
-      <input type="checkbox" class="task-list-item-checkbox" checked="" disabled=""> Add task lists to it</li>
-      <li class="task-list-item">
-      <input type="checkbox" class="task-list-item-checkbox" disabled=""> Take a vacation</li>
-      </ul>
-
-      <p>And a "mixed" task list:</p>
-
-      <ul class="task-list">
-      <li class="task-list-item">
-      <input type="checkbox" class="task-list-item-checkbox" disabled=""> Steal underpants</li>
-      <li>?</li>
-      <li class="task-list-item">
-      <input type="checkbox" class="task-list-item-checkbox" disabled=""> Profit!</li>
-      </ul>
-
-      <p>And a nested list:</p>
-
-      <ul class="task-list">
-      <li>Jackson 5
-
-      <ul class="task-list">
-      <li>Michael</li>
-      <li>Tito</li>
-      <li>Jackie</li>
-      <li>Marlon</li>
-      <li>Jermaine</li>
-      </ul>
-      </li>
-      <li>TMNT
-
-      <ul class="task-list">
-      <li>Leonardo</li>
-      <li>Michelangelo</li>
-      <li>Donatello</li>
-      <li>Raphael</li>
-      </ul>
-      </li>
-      </ul>
-
-      <p>Definition lists can be used with HTML syntax. Definition terms are bold and italic.</p>
-
-      <dl>
-          <dt>Name</dt>
-          <dd>Godzilla</dd>
-          <dt>Born</dt>
-          <dd>1952</dd>
-          <dt>Birthplace</dt>
-          <dd>Japan</dd>
-          <dt>Color</dt>
-          <dd>Green</dd>
-      </dl>
-
-      <hr>
-
-      <p>Tables should have bold headings and alternating shaded rows.</p>
-
-      <table>
-      <thead>
-      <tr>
-      <th>Artist</th>
-      <th>Album</th>
-      <th>Year</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-      <td>Michael Jackson</td>
-      <td>Thriller</td>
-      <td>1982</td>
-      </tr>
-      <tr>
-      <td>Prince</td>
-      <td>Purple Rain</td>
-      <td>1984</td>
-      </tr>
-      <tr>
-      <td>Beastie Boys</td>
-      <td>License to Ill</td>
-      <td>1986</td>
-      </tr>
-      </tbody>
-      </table>
-
-      <p>If a table is too wide, it should condense down and/or scroll horizontally.</p>
-
-      <table>
-      <thead>
-      <tr>
-      <th>Artist</th>
-      <th>Album</th>
-      <th>Year</th>
-      <th>Label</th>
-      <th>Awards</th>
-      <th>Songs</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-      <td>Michael Jackson</td>
-      <td>Thriller</td>
-      <td>1982</td>
-      <td>Epic Records</td>
-      <td>Grammy Award for Album of the Year, American Music Award for Favorite Pop/Rock Album, American Music Award for Favorite Soul/R&amp;B Album, Brit Award for Best Selling Album, Grammy Award for Best Engineered Album, Non-Classical</td>
-      <td>Wanna Be Startin' Somethin', Baby Be Mine, The Girl Is Mine, Thriller, Beat It, Billie Jean, Human Nature, P.Y.T. (Pretty Young Thing), The Lady in My Life</td>
-      </tr>
-      <tr>
-      <td>Prince</td>
-      <td>Purple Rain</td>
-      <td>1984</td>
-      <td>Warner Brothers Records</td>
-      <td>Grammy Award for Best Score Soundtrack for Visual Media, American Music Award for Favorite Pop/Rock Album, American Music Award for Favorite Soul/R&amp;B Album, Brit Award for Best Soundtrack/Cast Recording, Grammy Award for Best Rock Performance by a Duo or Group with Vocal</td>
-      <td>Let's Go Crazy, Take Me With U, The Beautiful Ones, Computer Blue, Darling Nikki, When Doves Cry, I Would Die 4 U, Baby I'm a Star, Purple Rain</td>
-      </tr>
-      <tr>
-      <td>Beastie Boys</td>
-      <td>License to Ill</td>
-      <td>1986</td>
-      <td>Mercury Records</td>
-      <td>noawardsbutthistablecelliswide</td>
-      <td>Rhymin &amp; Stealin, The New Style, She's Crafty, Posse in Effect, Slow Ride, Girls, (You Gotta) Fight for Your Right, No Sleep Till Brooklyn, Paul Revere, Hold It Now, Hit It, Brass Monkey, Slow and Low, Time to Get Ill</td>
-      </tr>
-      </tbody>
-      </table>
-
-      <hr>
-
-      <p>Code snippets like <code>var foo = "bar";</code> can be shown inline.</p>
-
-      <p>Also, <code>this should vertically align</code> <del><code>with this</code></del> <del>and this</del>.</p>
-
-      <p>Code can also be shown in a block element.</p>
-
-      <pre><code>var foo = "bar";
-</code></pre>
-
-      <p>Code can also use syntax highlighting.</p>
-
-      <div class="highlight highlight-Javascript"><pre><span class="pl-k">var</span> foo <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>bar<span class="pl-pds">"</span></span>;</pre></div>
-
-      <pre><code>Long, single-line code blocks should not wrap. They should horizontally scroll if they are too long. This line should be long enough to demonstrate this.</code></pre>
-
-      <div class="highlight highlight-Javascript"><pre><span class="pl-k">var</span> foo <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>The same thing is true for code with syntax highlighting. A single line of code should horizontally scroll if it is really long.<span class="pl-pds">"</span></span>;</pre></div>
-
-      <p>Inline code inside table cells should still be distinguishable.</p>
-
-      <table>
-      <thead>
-      <tr>
-      <th>Language</th>
-      <th>Code</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-      <td>Javascript</td>
-      <td><code>var foo = "bar";</code></td>
-      </tr>
-      <tr>
-      <td>Ruby</td>
-      <td><code>foo = "bar"</code></td>
-      </tr>
-      </tbody>
-      </table>
-
-      <hr>
-
-      <p>Small images should be shown at their actual size.</p>
-
-      <p><a href="https://camo.githubusercontent.com/16a9d5241f679b6429fc0597f10816dd2665bbb2/687474703a2f2f706c6163656b697474656e2e636f6d2f672f3330302f3230302f" target="_blank"><img src="https://camo.githubusercontent.com/16a9d5241f679b6429fc0597f10816dd2665bbb2/687474703a2f2f706c6163656b697474656e2e636f6d2f672f3330302f3230302f" alt="" data-canonical-src="https://placekitten.com/g/300/200/" style="max-width:100%;"></a></p>
-
-      <p>Large images should always scale down and fit in the content container.</p>
-
-      <p><a href="https://camo.githubusercontent.com/afe46418285497605cf4f6376b75f8c818658fb1/687474703a2f2f706c6163656b697474656e2e636f6d2f672f313230302f3830302f" target="_blank"><img src="https://camo.githubusercontent.com/afe46418285497605cf4f6376b75f8c818658fb1/687474703a2f2f706c6163656b697474656e2e636f6d2f672f313230302f3830302f" alt="" data-canonical-src="https://placekitten.com/g/1200/800/" style="max-width:100%;"></a></p>
-
-      <pre><code>This is the final element on the page and there should be no margin below this.</code></pre>
+      
 
       <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/jasonlong/cayman-theme">Cayman</a> is maintained by <a href="https://github.com/jasonlong">jasonlong</a>.</span>
-        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+        <span class="site-footer-owner"><a href="">Bond Assigner</a> is maintained by <a target="_blank" href="https://github.com/sharangdhar">Sharangdhar</a> and <a target="_blank" href="https://github.com/NarainKrishnamurthy">Narain</a>.</span>
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a target="_blank" href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
 
     </section>
