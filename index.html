@@ -11,7 +11,7 @@
   </head>
   <body>
     <section class="page-header">
-      <h1 class="project-name">Bond Assigner</h1>
+      <h1 class="project-name">The Bond Detector</h1>
       <h2 class="project-tagline">A Parallel Perfect Matching Graph Algortithm for Chemical Bond Assignment</h2>
       <a href="#" class="btn">Proposal</a>
       <a href="#" class="btn">View on Github</a>
@@ -33,7 +33,7 @@
       <a id="user-content-header-2" class="anchor" href="#header-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Summary</h2>
 
      
-      <p>We are implementing a system for multi-core CPUs that takes in a molecule whose bond orders are unknown and computes the optimal bond order assignment. We are building the system in C++ using OpenMP and will be using a parallel perfect matching algorithm to compute the bond assignment.</p>
+      <p>We are implementing a system for multi-core CPUs that takes in a molecule whose bond orders are unknown and computes the optimal bond order assignment subject to biological constraints. We are building the system in C++ using OpenMP and will be using a parallel perfect matching algorithm to compute the bond assignment.</p>
 
 
        <h2>
@@ -42,15 +42,20 @@
      
       <p>A molecule is an electrically neutral group of two or more atoms held together by chemical bonds. The bonds between the atoms determine many of the properties of the molecule. One common problem in the field of Computational Biology is determining molecular structure for molecules whose atomic coordinates are known but whose bonds are unknown. Given the atomic coordinates, we can complete the picture for a given molecule by specifying an assignment of bonds to the atoms within the molecule.  <br><br>
 
-      We can represent the atoms within a molecule as vertices and the bonds between them as edges. We note however that a single molecule can contain multiple bond types (e.g. single, double, triple). Computing an optimal assignment of these various types of bonds requires determining a perfect weighted matching for the molecule. A number of open source libraries attempt to implement this matching algorithm, but they are exponential in the number of fused rings (cycles) within the molecule. Given that molecules encountered in practice can have hundreds of atoms, an exponential solution is highly impractical. <br><br>
+      We can represent the atoms within a molecule as vertices and the bonds between them as edges. We note however that a single molecule can contain multiple bond types (e.g. single, double, triple). Computing an optimal assignment of these various types of bonds requires determining a perfect weighted matching for the molecule while respecting certain biological constraints (e.g. all carbon atoms can only have one double bond). A number of open source libraries attempt to implement this matching algorithm, but they are exponential in the number of fused rings (cycles) within the molecule. Given that molecules encountered in practice can have hundreds of atoms, an exponential solution is highly impractical.  <br><br>
 
-      To solve this problem, we are implementing a parallel perfect weighted matching algorithm that can be used to determine an optimal assignment. The algorithm is detailed in sections 3.1 and 3.2 of the course notes for the Fall 2004 edition of 15-859. It involves computing a sub-matrix determinant for each edge in the graph. The algorithm is inherently edge-parallel. Furthermore, we believe we can take advantage of the similarities of the sub-matrices to drastically reduce computation time. 
+      To solve this problem, we are implementing a parallel perfect weighted matching algorithm which can be used to determine an optimal assignment. The algorithm is detailed in secionts 3.1 and 3.2 of the course notes for the Fall 2004 edition of 15-859. We are also planning to implement a parallel memory-efficient algorithm to compute cofactor matrices, which will speed up the computation of the optimal weighted matching. We plan to follow the algorithm detailed in "A Parallel Algorithm for Calculation of Large Determinants with High Accuracy for GPUs and MPI Clusters" (Gleb Beliakov, Yuri Matiyasevich).<br><br>
+
+      In addition, we are implementing a mechanism which allows the user to specify bonding constraints on different types of atoms. We are meeting with Professor Geoffrey Hutchinson, who proposed the project idea, to discuss which constraint types would be useful to support.
+
       </p>
 
       <h2>
       <a id="user-content-header-2" class="anchor" href="#header-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>The Challenge</h2>
 
-      <p> COMING SOON !! </p>
+      <p>The parallel graph algorithms described in the paper assume that all vertices are identical. However, a given molecule can contain a wide variety of different atoms, some of which are subject to biological constraints. We will need to develop procedures to adapt the input graph so that the results of the algorithm respect the constraints on the molecules. <br><br>
+
+      Our algorithm for computing cofactor matrices relies on Gaussian elimination, so its memory accesses will be very predictable. We'll also be taking advantage of spatial and temportal locality by partitioning the matrix into blocks. </p>
 
       <h2>
       <a id="user-content-header-2" class="anchor" href="#header-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Resources</h2>
