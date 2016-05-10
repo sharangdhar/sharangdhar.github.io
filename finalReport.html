@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title> Chemposer </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="css/cayman.css">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Chemposer</h1>
+      <h2 class="project-tagline">A Parallel Perfect Matching Graph Algorithm for Chemical Bond Assignment</h2>
+      <a href="index.html" class="btn">Proposal</a>
+      <a href="checkpoint.html" class="btn">Checkpoint</a>
+      <a href="#" class="btn">Final Report</a>
+      <a href="https://github.com/NarainKrishnamurthy/chemposer" target="_blank" class="btn">View on Github</a>
+    </section>
+
+    <section class="main-content">
+ 
+      <h1 align="center">
+      <a id="user-content-header-1" class="anchor" href="#header-1" aria-hidden="true"><span class="octicon octicon-link"></span></a><b>Final Report</b></h1>
+
+
+      <h2>
+      <a id="user-content-header-2" class="anchor" href="#header-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Summary</h2>
+
+      <p>We implemented a parallel perfect matching algorithm for Chemical Bond Assignment on the CPU and in CUDA on the GPU and compared the performance of the two implementations.</p>
+
+    
+
+      <h2>
+      <a id="user-content-header-2" class="anchor" href="#header-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Background</h2>
+
+     
+      <p>Our problem was of bond perception, a common task in computational Chemistry. This came down to implementing a parallel perfect matching algorithm for a connected undirected graph. The existing libraries that do bond perception are exponential in runtime and not implemented on parallel architectures. The current sequential perfect matching algorithms are around O(V<sup>2.5</sup>) work and the parallel algorithms are in RNC. Our algorithm is in O(N*log<sup>k</sup>(N)), where k is a constant.</p>
+
+<p>
+Our Basic Algorithm:
+
+<ul class="task-list">
+<li>Perceive single bonds using simple distance formula on input atoms.</li><br>
+<li>Assign double bonds via a perfect matching on the graph induced by the single bonds.</li><br>
+<li>Perfect matching guaranteed by structure of molecule.</li><br>
+ </ul>
+The second step is where we took advantage of the Rabin Vazirani algorithm. After building the initial adjacency matrix, we turned it into a Tutte matrix. A Tutte matrix is defined as follows - 
+</p>
+
+<img src="tutte.png" alt="Mountain View">
+
+
+<p>
+On a high level, the algorithm finds edges to include in the matching by leveraging properties of the Tutte Matrix. It deletes two rows and two columns from the Tutte matrix at every iteration and puts that pair of vertices as an edge in the matching. It keeps doing so until the matrix is completely used and all vertices are paired with exactly one other vertex. The original algorithm computes the determinant to check if a perfect matching exists. We don’t do so because we are guaranteed that at least one exists.</p>
+
+<p>Our problem to figure out the edges to delete translated into solving a system of linear equations. We used LU decomposition with partial pivoting to solve the equation PA = LU. We then used forward and back solving to solve Ly=Pb and then solved Ux=y. Once we solved these equations, we used the results in the Rabin Vazirani algorithm and decided which edges to remove based on certain constraints in RV algorithm.</p>
+
+<p>We represented our input graph(molecule structure) as an adjacency matrix. Our output was a representation of the edges in the matching which translated to assignment of single and double bonds to our atoms. We used a vector of vectors representation for our adjacency matrix.</p>
+
+<p>
+This problem is highly parallelizable in nature as a majority of the computation on each iteration of the algorithm is independent of each other and is not arithmetically intensive. We tried openMp and CUDA, and the results are below. A huge bottleneck for performance was the amount of memory needed. Other than that, finding smart access patterns to do operations on matrix was also something that had a lot of scope for giving good speedup. The only dependencies are between iterations choosing which edge to put in the final matching. Each of those iterations is highly parallelizable.</p>
+     
+ <h2><a id="user-content-header-2" class="anchor" href="#header-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Approach</h2>
+
+
+<blockquote><h3>Rabin Vazirani Implementation</h3></blockquote>
+
+<p>
+The original Rabin Vazirani (RV) algorithm requires computing a matrix inverse at each iteration. However, performing a matrix inversion for large matrices is very numerically unstable. Each iteration RV only requires the first row or column of A<sup>-1</sup>. Thus, instead of computing A<sup>-1</sup> directly, we solve the system Ax=b where b=<1,0,0, ... ,0>. This makes x the first column of A<sup>-1</sup>.</p>
+
+<p>
+Once we compute x, we perform a simple sequential loop to find the edge (u,v) that will be added to the matching. We now have to delete the rows and columns corresponding to u,v from A. The original algorithm does not specify a mechanism for doing this, so we chose to implement an in-place deletion mechanism, discussed in the section below.</p>
+
+<blockquote><h3>Matrix Deletion</h3></blockquote>
+<p>Our implementation deletes rows in place by copying over the current values of A with the appropriate post-deletion values. To avoid read/write contention for the same cells, we create the rows of the new matrix one at a time. Since we're always deleting the first row and column, each current row of A will be shift up. When shifting a row, we run a kernel that shifts the entire row up at once. </p>
+
+<p>There are certainly more time-effieicnt ways to perform this step. For example, we could create an empty matrix M, store the new value in M, and delete A. In practice however, we found that minimizing memory usage resulted in better performance than minimizing the algorithm's total work on this step. </p>
+
+<blockquote><h3>LU Decomposition</h3></blockquote>
+<p>We use Gaussian Elimination with partial pivoting to construct the LU matrix. To improve performance, we perform the LU factorization in place on a copy of the matrix A. The sequential nature of Gaussian Elimination requires us to compute the previous (k-1) columns of L/U before we can compute the kth column. However, the computation of a particular column is highly parallelizable.</p> 
+
+<p>In particular, computing a column requires the following kernels: a single O(log(N)) reduce to find the next pivot, an O(1) map to swap to pivor row and the current row, an O(1) map to compute the values of L matrix, and an O(1) map to compute values of the U matrix. Each of these maps consist of two lookups and an arithmetic operation. As a rseult of this very low arithmetic intensity, column computation tends to be very fast. The main bottleneck in performance is the fact that the kernels can only be executed in one order. Performance analysis shows that program spends a non-trivial amount of time at barriers.</p> 
+
+<blockquote><h3>Forward/Backward Solving</h3></blockquote>
+<p>We use a naive sequential implementation of forward/backward substitution. We planned on parallelizing the inner for-loops, i.e. the loops that iterate through the previous values of y (x) to compute the next value. However, due to time constraints we were unable to finish this. Performance profiling suggests that algorithm spends a non-trivial amount of time on the forward/backward step, especially on larger matrices. Given more time, we would definitely have attempted to implement a more parallel forward/backward solution.</p>
+
+<blockquote><h3>Architecture</h3></blockquote>
+<p>We chose to implement our algorithm for GPUs. We used the CUDA and thrust libraries in our implementation. The low arithmetic intensity and high memory usage of our algorithm made GPUs a very attractive choice. </p>
+
+<p>Prior to settling on GPUs, we considering implementing the algorithm in OpenMP. We made a simple OpenMP version of our sequential implementation and ran it on the six-core hyperthreaded GHC 26. However, the implementation yielded same or poorer performance than our sequential implementation on our test set. We intended to run the implementation on the 61-core Xeon Phi architecture, but were unable to do so due to time-constraints. Given more time, we would've optimized our OpenMP implementation and tested it on multiple multi-core machines. </p>
+
+<blockquote><h3>Optimizations</h3></blockquote>
+<p>When profiling our code, we discovered that the program spends a significant amount of it's run-time allocating memory and copying memory from host to device (or vice-versa). As shown in CUDA API call portion of the results section, cudaMemcpy and cudaFree occupy the most processor time on medium and large matrices.</p> 
+
+<p>To improve performance, we minized the program's memory usage by implementing algorithms in-place, re-using temporary variables, and minimizing copying (in both directions). We also condensed variable representations whenever possible. As an example, rather than allocate space for a permutation matrix P, a vector b, and the product of the two Pb, we replaced all three variables with a single vector for Pb. Using our fore-knowledge of the vector b, we were able to compute Pb during the course of the LU decomposition without the need to use or store P or b. </p>
+
+
+<p>We also took care to remove synchronization barriers wherever possible. Our original code had multiple unecessary cudaDeviceSynchronize() calls. Our performance sped up dramatically upon removal of these calls.</p>
+
+
+ <h2><a id="user-content-header-2" class="anchor" href="#header-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Results</h2>
+
+
+<blockquote><h3>Test Machine and Test Set</h3></blockquote>
+<p>We performed all tests on the GHC 26 machine which sports an NVIDIA GTX 480 GPU and compute capability 2.0. Our test set was a combination of carbon rings and tubes of various sizes ranging from 20 to 988 atoms.</p>
+
+<blockquote><h3>Sequential Benckmark</h3></blockquote>
+<p>Our sequential benchmark was our C++ implementation of the rabin vazirani algorithm using the LU decomposition technique to solve for the first column of A<sup>-1</sup>. We used the Eigen linear algebra library in our implementation. We used Eigen data types for our variables and Eigen library functions to copy and initialize variables. Aside from those functions however, the sequential implementation was entirely hand-written. </p>
+
+<blockquote><h3>Run-Time Comparison</h3></blockquote>
+<p>The following plot illustrates the run-time of both implementations across the entire test set. While the two implementations report similar initial run-times, the CUDA version scales significnatly better as the number of atoms increases. We have strong reason to believe this trend holds at even large molecule sizes. We originally planned to include a 1800 atom molecule in our test set. However, while the CUDA implementation took 5 minutes to procesx the molecule, the sequential version failed to terminate after 15 minutes. </p>
+
+<img src="graph1.png" alt="Mountain View">
+
+<p>The following plot the f(x) = (sequential run time on x)/(CUDA run time on x).</p> 
+
+
+
+<img src="graph2.png" alt="Mountain View">
+
+
+<p>The follow graph illustratates the time spent on each CUDA API call as a function of the size of the input molecule. During performance profiling, we discovered that CUDA API calls dominate the running time of the algorithm for molecules with 200 or more atoms.</p>
+
+ <p>It is interesting to note that cudaMemcpy consumes the majority of the API call time on the largest graphs. We use cudaMemcpy rather sparingly, so we were quite surprised that it still scaled so dramatically with the number of atoms. We also found it intersting that cudaFree consumed a much larger portion of the run-time than cudaMalloc and cudaMallocHost combined on nearly all inputs. This suggests that our implementation may have hidden negative consequences with regard to freeing memory that we are not aware of. </p>
+
+
+<img src="graph3.png" alt="Mountain View">
+
+
+ <h2><a id="user-content-header-2" class="anchor" href="#header-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Demo</h2>
+ We built a webapp to demo our project. The code for the webapp can be found <a href="https://github.com/sharangdhar/418Project" target="_blank">here</a>.
+
+ <h2><a id="user-content-header-2" class="anchor" href="#header-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>References</h2>
+ <ul class="task-list">
+        <li><a target="_blank" href="http://arxiv.org/pdf/1308.1536.pdf" >A Parallel Algorithm for Calculation of Large Determinants with High Accuracy for GPUs and MPI clusters</a></li> <br>
+
+        <li><a target="_blank" href="http://theory.stanford.edu/~virgi/cs367/oldlecs/lecture9.pdf">Rabin Vazirani</a></li><br>
+
+      <li><a target="_blank" href="http://mypages.iit.edu/~xxiong3/files/xiong_iccad12.pdf">Parallel Forward and Back Substitution for Efficient Power Grid Simulation</a></li><br>
+
+        <li><a target="_blank" href="http://www.math.iit.edu/~fass/477577_Chapter_7.pdf">Gaussian Elimination and LU Factorization</a></li><br>
+</ul>
+
+
+
+
+ <h2><a id="user-content-header-2" class="anchor" href="#header-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>List of work by each student</h2>
+ <p>Equal work was performed by both project members.</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/NarainKrishnamurthy/chemposer" target="_blank">Chemposer</a> is maintained by <a target="_blank" href="https://github.com/sharangdhar">Sharangdhar</a> and <a target="_blank" href="https://github.com/NarainKrishnamurthy">Narain</a>.</span>
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a target="_blank" href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  </body>
+</html>
+  
